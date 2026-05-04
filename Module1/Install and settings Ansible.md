@@ -17,16 +17,17 @@
 - Есть доступ в интернет для установки пакетов
 
 ### Схема сети (пример):
-
+Включить все машины. 
+Узанть их ip адреса и записать себе в блокнот. IP адресация динамическая, срок аренды 1 неделя.
 ```
-Control Node: 192.168.1.10   (hostname: ansible-controller)
-Managed Node1: 192.168.1.11  (hostname: web-server)
-Managed Node2: 192.168.1.12  (hostname: db-server)
+Control Node: (hostname: ansible-controller)
+Managed Node1: (hostname: server1)
+Managed Node2: (hostname: server2)
 ```
 
 ---
 
-## Часть 1. Подготовка окружения (15 минут)
+## Часть 1. Подготовка окружения 
 
 ### Шаг 1.1. Создание пользователя для Ansible
 
@@ -41,7 +42,7 @@ useradd -m -s /bin/bash ansible
 
 # Установить пароль (на время лабораторной)
 passwd ansible
-# Введите пароль: ansible123
+# Введите пароль: 1 (парольной политики нет)
 
 # Добавить пользователя в группу sudo
 usermod -aG sudo ansible
@@ -66,11 +67,11 @@ sudo whoami
 
 ---
 
-## Часть 2. Установка Ansible (10 минут)
+## Часть 2. Установка Ansible
 
 ### Шаг 2.1. Установка на Control Node
 
-**Выполнить ТОЛЬКО на управляющем узле (192.168.1.10):**
+**Выполнить ТОЛЬКО на управляющем узле :**
 
 ```bash
 # Обновление списка пакетов
@@ -92,7 +93,7 @@ ansible [core 2.x.x]
 
 ---
 
-## Часть 3. Настройка SSH-доступа (15 минут)
+## Часть 3. Настройка SSH-доступа 
 
 ### Шаг 3.1. Генерация SSH-ключа на Control Node
 
@@ -115,13 +116,13 @@ ls -la ~/.ssh/
 **Выполнить на Control Node от пользователя ansible:**
 
 ```bash
-# Копирование ключа на Managed Node 1 (192.168.1.11)
-ssh-copy-id ansible@192.168.1.11
-# При запросе пароля: ansible123
+# Копирование ключа на Managed Node 1 (ip server1)
+ssh-copy-id ansible@ip server1
+# При запросе пароля: 1
 
-# Копирование ключа на Managed Node 2 (192.168.1.12)
-ssh-copy-id ansible@192.168.1.12
-# При запросе пароля: ansible123
+# Копирование ключа на Managed Node 2 (ip server2)
+ssh-copy-id ansible@ip server2
+# При запросе пароля: 1
 ```
 
 ### Шаг 3.3. Проверка SSH-подключения
@@ -130,17 +131,17 @@ ssh-copy-id ansible@192.168.1.12
 
 ```bash
 # Проверка подключения к Node1
-ssh ansible@192.168.1.11 hostname
-# Должно вывести: web-server
+ssh ansible@ip server1 hostname
+# Должно вывести: server1
 
 # Проверка подключения к Node2
-ssh ansible@192.168.1.12 hostname
-# Должно вывести: db-server
+ssh ansible@ip server2 hostname
+# Должно вывести: server2
 ```
 
 ---
 
-## Часть 4. Создание инвентаря (10 минут)
+## Часть 4. Создание инвентаря 
 
 ### Шаг 4.1. Создание директории для лабораторной
 
@@ -167,11 +168,11 @@ nano ~/ansible-lab/inventory.ini
 
 # Группа веб-серверов
 [webservers]
-web-server ansible_host=192.168.1.11 ansible_user=ansible
+server1 ansible_host=ip server1 ansible_user=ansible
 
 # Группа баз данных
 [databases]
-db-server ansible_host=192.168.1.12 ansible_user=ansible
+server2 ansible_host=ip server2 ansible_user=ansible
 
 # Группа всех серверов
 [all:children]
@@ -199,13 +200,13 @@ ansible databases -i inventory.ini --list-hosts
 **Ожидаемый вывод:**
 ```
   hosts (2):
-    web-server
-    db-server
+    server1
+    server2
 ```
 
 ---
 
-## Часть 5. Создание конфигурационного файла Ansible (10 минут)
+## Часть 5. Создание конфигурационного файла Ansible
 
 ### Шаг 5.1. Создание ansible.cfg
 
@@ -259,7 +260,7 @@ ansible --version | grep "config file"
 
 ---
 
-## Часть 6. Проверка окружения (15 минут)
+## Часть 6. Проверка окружения 
 
 ### Шаг 6.1. Базовая проверка ping
 
@@ -272,14 +273,14 @@ ansible all -m ping
 
 **Ожидаемый вывод:**
 ```
-web-server | SUCCESS => {
+server1 | SUCCESS => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python3"
     },
     "changed": false,
     "ping": "pong"
 }
-db-server | SUCCESS => {
+server2 | SUCCESS => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python3"
     },
@@ -333,7 +334,7 @@ ansible all -b -m shell -a "tail -n 5 /var/log/syslog"
 
 ---
 
-## Часть 7. Первый плейбук (15 минут)
+## Часть 7. Первый плейбук 
 
 ### Шаг 7.1. Создание простого плейбука
 
@@ -407,14 +408,14 @@ ansible-playbook test-playbook.yml
 
 ### Шаг 7.3. Проверка результатов на Managed Nodes
 
-**На Managed Node 1 (web-server):**
+**На Managed Node 1 (server1):**
 
 ```bash
 # Проверка созданного файла
 cat /tmp/ansible_test.txt
 ```
 
-**На Managed Node 2 (db-server):**
+**На Managed Node 2 (server2):**
 
 ```bash
 # Проверка созданного файла
@@ -445,26 +446,11 @@ cat /tmp/ansible_test.txt
 
 ---
 
-## ✅ Чек-лист завершения лабораторной
-
-- [ ] Пользователь `ansible` создан на всех трёх машинах
-- [ ] Настроен sudo без пароля для пользователя `ansible`
-- [ ] Ansible установлен на Control Node
-- [ ] Сгенерирован и скопирован SSH-ключ на Managed Nodes
-- [ ] Создан файл инвентаря `inventory.ini`
-- [ ] Создан конфигурационный файл `ansible.cfg`
-- [ ] Команда `ansible all -m ping` выполняется успешно
-- [ ] Ad-hoc команды работают на обоих хостах
-- [ ] Плейбук `test-playbook.yml` отработал без ошибок
-- [ ] Файл `/tmp/ansible_test.txt` создан на обоих Managed Nodes
-
----
-
 ## 🔧 Возможные проблемы и решения
 
 | Проблема | Решение |
 |----------|---------|
-| `Host key verification failed` | Выполнить `ssh-keyscan 192.168.1.11 >> ~/.ssh/known_hosts` или настроить `host_key_checking = False` |
+| `Host key verification failed` | Выполнить `ssh-keyscan ip  >> ~/.ssh/known_hosts` или настроить `host_key_checking = False` |
 | `Permission denied` при sudo | Проверить настройки sudoers: `ansible ALL=(ALL) NOPASSWD: ALL` |
 | `Python not found` | Установить Python: `sudo apt install python3` |
 | `Connection timeout` | Проверить сетевую связность: `ping 192.168.1.11` |
