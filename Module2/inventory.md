@@ -352,12 +352,12 @@ ansible all:!database -i inventories/production/hosts -m ping
 # Если у вас есть пересекающиеся группы, создайте тестовый инвентарь
 cat > ~/ansible-lab/inventories/test-intersection.ini << 'EOF'
 [production]
-server1
-server2
+server1 ansible_host=ip server 1
+server2 ansible_host=ip server2
 
 [staging]
-server2
-server3
+server2 ansible_host=ip server 2
+server3 ansible_host=ip server3
 
 [both:children]
 production
