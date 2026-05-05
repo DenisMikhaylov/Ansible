@@ -138,6 +138,8 @@ nano ~/ansible-lab/inventories/production/hosts
 # Группа веб-серверов (используем реальные хосты)
 [webservers]
 web-server ansible_host=ip server 1
+
+[database]
 db-server ansible_host=ip server2
 
 # Группа с переменными
