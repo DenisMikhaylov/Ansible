@@ -151,12 +151,9 @@ app_home=/opt/app
 
 # Вложенные группы
 [uk:children]
-frontend
-backend
+webservers
+app_servers
 
-[europe:children]
-uk
-germany
 
 [europe:vars]
 ntp_server=europe.pool.ntp.org
