@@ -232,7 +232,7 @@ ansible-playbook first-playbook.yml --limit web-server --list-hosts
 ### Шаг 3.2. Пошаговый режим
 
 ```bash
-ansible-playbook file-playbook.yml --step
+ansible-playbook first-playbook.yml --step
 ```
 
 **Работа с пошаговым режимом:**
@@ -244,8 +244,8 @@ ansible-playbook file-playbook.yml --step
 ### Шаг 3.3. Повторный запуск (идемпотентность)
 
 ```bash
-# Ещё раз запустим file-playbook
-ansible-playbook file-playbook.yml
+# Ещё раз запустим first-playbook
+ansible-playbook first-playbook.yml
 ```
 
 **Ожидаемый результат:** Все задачи покажут `ok`, а не `changed`, так как файлы уже созданы и соответствуют желаемому состоянию.
