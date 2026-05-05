@@ -155,7 +155,7 @@ webservers
 app_servers
 
 
-[europe:vars]
+[uk:vars]
 ntp_server=europe.pool.ntp.org
 timezone=Europe/London
 
